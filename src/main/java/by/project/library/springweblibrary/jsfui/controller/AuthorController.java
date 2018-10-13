@@ -3,6 +3,7 @@ package by.project.library.springweblibrary.jsfui.controller;
 import by.project.library.springweblibrary.dao.AuthorDao;
 import by.project.library.springweblibrary.domain.Author;
 import by.project.library.springweblibrary.jsfui.model.LazyDataTable;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
@@ -31,6 +32,9 @@ public class AuthorController extends AbstractController<Author> {
     @Autowired
     private AuthorDao authorDao;
 
+    @Autowired
+    private SprController sprController;
+
     private Author selectedAuthor;
 
     private LazyDataTable<Author> lazyModel;
@@ -49,6 +53,17 @@ public class AuthorController extends AbstractController<Author> {
 
     @Override
     public Page<Author> search(int pageNumber, int pageSize, String sortField, Sort.Direction sortDirection) {
+
+        if (sortField == null) {
+            sortField = "fio";
+        }
+
+        if (Strings.isNullOrEmpty(sprController.getSearchText())) {
+            authorPages = authorDao.getAll(pageNumber, pageSize, sortField, sortDirection);
+        } else {
+            authorPages = authorDao.search(pageNumber, pageSize, sortField, sortDirection, sprController.getSearchText());
+        }
+
         return authorPages;
     }
 

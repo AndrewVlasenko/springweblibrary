@@ -22,7 +22,10 @@
 
                             <ui:fragment >
                                 <li>
-                                    <o:graphicImage name="images/books.png" style="height:50px; padding:10px;" dataURI="true"/>
+                                    <p:commandLink style="padding:10px" actionListener="#{bookController.showAll}"
+                                                   update="@([id$=booksList])">
+                                        <o:graphicImage name="images/books.png" style="height:30px" dataURI="true"/>
+                                    </p:commandLink>
                                 </li>
                             </ui:fragment>
 
@@ -58,7 +61,7 @@
                                 <p:inputText style="margin-right:10px" placeholder="#{msg.search}"
                                              value="#{bookController.searchText}" styleClass="search"/>
                                 <p:commandButton styleClass="search-button" value="search" process="@form"
-                                                 update="@([id$=booksList]) "
+                                                 update="@([id$=booksList])"
                                                  actionListener="#{bookController.searchAction}"
                                                  style="visibility: hidden"/>
 

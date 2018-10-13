@@ -3,6 +3,7 @@ package by.project.library.springweblibrary.jsfui.controller;
 import by.project.library.springweblibrary.dao.GenreDao;
 import by.project.library.springweblibrary.domain.Genre;
 import by.project.library.springweblibrary.jsfui.model.LazyDataTable;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
@@ -29,6 +30,9 @@ public class GenreController extends AbstractController<Genre> {
     @Autowired
     private GenreDao genreDao;
 
+    @Autowired
+    private SprController sprController;
+
     private Genre selectedGenre;
 
     private LazyDataTable<Genre> lazyModel;
@@ -51,23 +55,40 @@ public class GenreController extends AbstractController<Genre> {
     }
 
     @Override
-    public Page<Genre> search(int first, int count, String sortField, Sort.Direction sortDirection) {
+    public Page<Genre> search(int pageNumber, int pageSize, String sortField, Sort.Direction sortDirection) {
+
+        if (sortField == null) {
+            sortField = "name";
+        }
+
+        if (Strings.isNullOrEmpty(sprController.getSearchText())) {
+            genrePages = genreDao.getAll(pageNumber, pageSize, sortField, sortDirection);
+        } else {
+            genrePages = genreDao.search(pageNumber, pageSize, sortField, sortDirection, sprController.getSearchText());
+        }
+
         return genrePages;
     }
 
     @Override
     public void addAction() {
-
+        selectedGenre = new Genre();
+        showEditDialog();
     }
 
     @Override
     public void editAction() {
+        showEditDialog();
+    }
 
+    private void showEditDialog() {
+
+        RequestContext.getCurrentInstance().execute("PF('dialogGenre').show()");
     }
 
     @Override
     public void deleteAction() {
-
+        genreDao.delete(selectedGenre);
     }
 
     public List<Genre> getAll() {

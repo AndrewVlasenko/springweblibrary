@@ -3,6 +3,7 @@ package by.project.library.springweblibrary.jsfui.controller;
 import by.project.library.springweblibrary.dao.PublisherDao;
 import by.project.library.springweblibrary.domain.Publisher;
 import by.project.library.springweblibrary.jsfui.model.LazyDataTable;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
@@ -32,9 +33,10 @@ public class PublisherController extends AbstractController<Publisher> {
     @Autowired
     private PublisherDao publisherDao;
 
+    @Autowired
+    private SprController sprController;
 
     private Publisher selectedPublisher;
-
 
     private LazyDataTable<Publisher> lazyModel;
 
@@ -50,6 +52,17 @@ public class PublisherController extends AbstractController<Publisher> {
 
     @Override
     public Page<Publisher> search(int pageNumber, int pageSize, String sortField, Sort.Direction sortDirection) {
+
+        if (sortField == null) {
+            sortField = "name";
+        }
+
+        if (Strings.isNullOrEmpty(sprController.getSearchText())) {
+            publisherPages = publisherDao.getAll(pageNumber, pageSize, sortField, sortDirection);
+        } else {
+            publisherPages = publisherDao.search(pageNumber, pageSize, sortField, sortDirection, sprController.getSearchText());
+        }
+
         return publisherPages;
     }
 
